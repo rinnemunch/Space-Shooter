@@ -153,8 +153,10 @@ MonoBehaviour:
   _enemyPrefab: {fileID: 3595883735038599306, guid: 5f44e81c1c91c6948b1063dab0295f5e,
     type: 3}
   _enemyContainer: {fileID: 1905196097}
-  _tripleShotPowerupPrefab: {fileID: 7105141414804718604, guid: fe7eb13e493c0064babc0a26e72e62fb,
-    type: 3}
+  powerups:
+  - {fileID: 7105141414804718604, guid: fe7eb13e493c0064babc0a26e72e62fb, type: 3}
+  - {fileID: 8934300176630500149, guid: 89c4d18cf00ed8c409cb2a8d3b5cfff4, type: 3}
+  - {fileID: 0}
 --- !u!4 &1229720878
 Transform:
   m_ObjectHideFlags: 0
@@ -291,7 +293,7 @@ MonoBehaviour:
     type: 3}
   _fireRate: 0.15
   _lives: 3
-  _isTripleShotActive: 0
+  _isSpeedBoostActive: 0
 --- !u!212 &1419756623
 SpriteRenderer:
   m_ObjectHideFlags: 0
