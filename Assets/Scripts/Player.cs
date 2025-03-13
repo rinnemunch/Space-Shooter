@@ -18,7 +18,12 @@ public class Player : MonoBehaviour
     private int _lives = 3;
     private SpawnManager _spawnManager;
 
-  
+    [SerializeField]
+    private int _score;
+
+    private UIManager _uiManager;   
+
+
     private bool _isTripleShotActive = false;
     private bool _isSpeedBoostActive = false;
     private bool _isShieldActive = false;
@@ -29,10 +34,16 @@ public class Player : MonoBehaviour
     {
         transform.position = new Vector3(0, 0, 0);
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 
         if (_spawnManager == null)
         {
             Debug.LogError("The Spawn Manager is NULL.");
+        }
+
+        if (_uiManager == null)
+        {
+            Debug.LogError("The UI Manager is NULL.");
         }
     }
 
@@ -56,9 +67,9 @@ public class Player : MonoBehaviour
 
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
-            transform.Translate(direction * _speed * Time.deltaTime);
-       
-            transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0), 0);
+        transform.Translate(direction * _speed * Time.deltaTime);
+
+        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0), 0);
 
 
         if (transform.position.x > 11.3f)
@@ -73,9 +84,9 @@ public class Player : MonoBehaviour
 
     void FireLaser()
     {
-            _canFire = Time.time + _fireRate;
+        _canFire = Time.time + _fireRate;
 
-            if (_isTripleShotActive == true)
+        if (_isTripleShotActive == true)
         {
             Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
         }
@@ -83,8 +94,6 @@ public class Player : MonoBehaviour
         {
             Instantiate(_laserPrefab, transform.position + new Vector3(0, 1.05f, 0), Quaternion.identity);
         }
-
-        Instantiate(_laserPrefab, transform.position + new Vector3(0, 1.05f, 0), Quaternion.identity);
     }
 
     public void Damage()
@@ -97,7 +106,9 @@ public class Player : MonoBehaviour
         }
 
 
-        _lives --;
+        _lives--;
+
+        _uiManager.UpdatetLives(_lives);
 
         if (_lives < 1)
         {
@@ -138,4 +149,13 @@ public class Player : MonoBehaviour
         _isShieldActive = true;
         _shieldVisualizer.SetActive(true);
     }
+
+    public void AddScore(int points)
+    {
+        _score += points;
+        _uiManager.UpdateScore(_score);
+    }
+
+    //method to add 10 to the score
+    //Communicate with UIManager to update the score
 }
