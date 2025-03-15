@@ -29,6 +29,8 @@ public class Player : MonoBehaviour
     private bool _isShieldActive = false;
     [SerializeField]
     private GameObject _shieldVisualizer;
+    [SerializeField]
+    private GameObject _rightEngine, _leftEngine;
 
     void Start()
     {
@@ -107,6 +109,14 @@ public class Player : MonoBehaviour
 
 
         _lives--;
+        if (_lives == 2)
+        {
+            _leftEngine.SetActive(true);
+        }
+        else if (_lives == 1)
+        {
+            _rightEngine.SetActive(true);
+        }
 
         _uiManager.UpdatetLives(_lives);
 
