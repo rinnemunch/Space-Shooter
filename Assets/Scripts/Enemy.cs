@@ -53,7 +53,8 @@ public class Enemy : MonoBehaviour
 
             _anim.SetTrigger("OnEnemyDeath");
             _speed = 0;
-            Destroy(this.gameObject, 2.8f);  
+            GetComponent<Collider2D>().enabled = false; // Disable the collider
+            Destroy(this.gameObject, 2.8f);
         }
 
         if (other.tag == "Laser")
@@ -67,7 +68,8 @@ public class Enemy : MonoBehaviour
 
             _anim.SetTrigger("OnEnemyDeath");
             _speed = 0;
-            Destroy(other.gameObject, 2.8f);
+            GetComponent<Collider2D>().enabled = false; // Disable the collider
+            Destroy(this.gameObject, 2.8f);
         }
     }
 }

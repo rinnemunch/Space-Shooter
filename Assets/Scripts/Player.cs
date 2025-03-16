@@ -109,6 +109,7 @@ public class Player : MonoBehaviour
 
 
         _lives--;
+        
         if (_lives == 2)
         {
             _leftEngine.SetActive(true);
