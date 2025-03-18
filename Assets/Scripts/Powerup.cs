@@ -9,6 +9,11 @@ public class Powerup : MonoBehaviour
 
     [SerializeField]
     private int powerupID; // 0 = TripleShot, 1 = Speed, 2 = Shield
+    [SerializeField]
+    private AudioClip _clip; 
+
+
+
 
     void Update()
     {
@@ -25,6 +30,9 @@ public class Powerup : MonoBehaviour
         if (other.tag == "Player")
         {
             Player player = other.transform.GetComponent<Player>();
+
+            AudioSource.PlayClipAtPoint(_clip, Camera.main.transform.position, 1f);
+
             if (player != null)
             {              
                 switch(powerupID)
