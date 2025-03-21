@@ -34,7 +34,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _shieldVisualizer;
     [SerializeField]
-    private GameObject _rightEngine, _leftEngine;
+    private GameObject _rightEngine, _leftEngine; 
+    [SerializeField] 
+    private float _thrusterSpeed = 5.0f;
 
     void Start()
     {
@@ -80,13 +82,18 @@ public class Player : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
-        transform.Translate(direction * _speed * Time.deltaTime);
+        // Check if the left shift key is held down
+        float currentSpeed = _speed;
+        if (Input.GetKey(KeyCode.RightShift))
+        {
+            currentSpeed *= _thrusterSpeed;
+        }
+
+        transform.Translate(direction * currentSpeed * Time.deltaTime);
 
         transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0), 0);
-
 
         if (transform.position.x > 11.3f)
         {
