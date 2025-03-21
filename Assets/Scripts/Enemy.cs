@@ -60,7 +60,7 @@ public class Enemy : MonoBehaviour
     void FireLaser()
     {
         Vector3 laserPosition = transform.position + new Vector3(0, -1.05f, 0);
-        GameObject enemyLaser = Instantiate(_laserPrefab, laserPosition, Quaternion.identity);
+        GameObject enemyLaser = Instantiate(_laserPrefab, laserPosition, Quaternion.identity, transform);
 
         // Grab all Laser components in this prefab (including children).
         Laser[] lasers = enemyLaser.GetComponentsInChildren<Laser>();
