@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    // handle to text 
     [SerializeField]
     private Text _scoreText;
     [SerializeField]
@@ -17,12 +16,13 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _restartText;
 
+    [SerializeField]
+    private Text _ammoText; // Added for displaying ammo
+
     private GameManager _gameManager;
 
-    // Start is called before the first frame update
     void Start()
     {
-        
         _scoreText.text = "Score: " + 0;
         _gameOverText.gameObject.SetActive(false);
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
@@ -30,6 +30,11 @@ public class UIManager : MonoBehaviour
         if (_gameManager == null)
         {
             Debug.LogError("Game Manager is NULL");
+        }
+
+        if (_ammoText != null)
+        {
+            _ammoText.text = "Ammo: 15";
         }
     }
 
@@ -48,6 +53,14 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void UpdateAmmo(int currentAmmo)
+    {
+        if (_ammoText != null)
+        {
+            _ammoText.text = "Ammo: " + currentAmmo.ToString();
+        }
+    }
+
     void GameOverSequence()
     {
         _gameManager.GameOver();
@@ -55,6 +68,7 @@ public class UIManager : MonoBehaviour
         _restartText.gameObject.SetActive(true);
         StartCoroutine(GameOverFlickerRoutine());
     }
+
     IEnumerator GameOverFlickerRoutine()
     {
         while (true)

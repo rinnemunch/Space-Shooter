@@ -36,18 +36,20 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _rightEngine, _leftEngine;
 
-    // Shield Strength Visual
     private int _shieldStrength = 3;
     private SpriteRenderer _shieldRenderer;
 
-    // Thruster System Variables
+    // Thruster System
     [SerializeField] private float _thrusterSpeed = 5.0f;
     [SerializeField] private float _maxThrusterCharge = 1.0f;
     private float _currentThrusterCharge;
     private bool _isCoolingDown;
-
     [SerializeField] private Slider _thrusterSlider;
     [SerializeField] private Image _thrusterFillImage;
+
+    // Ammo System
+    [SerializeField] private int _maxAmmo = 15;
+    private int _currentAmmo;
 
     void Start()
     {
@@ -55,17 +57,20 @@ public class Player : MonoBehaviour
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _audioSource = GetComponent<AudioSource>();
+        _shieldRenderer = _shieldVisualizer.GetComponent<SpriteRenderer>();
 
         if (_spawnManager == null) Debug.LogError("The Spawn Manager is NULL.");
         if (_uiManager == null) Debug.LogError("The UI Manager is NULL.");
         if (_audioSource == null) Debug.LogError("The Audio Source on the player is NULL.");
-        else _audioSource.clip = _laserSoundClip;
-
-        _shieldRenderer = _shieldVisualizer.GetComponent<SpriteRenderer>();
         if (_shieldRenderer == null) Debug.LogError("Shield Visualizer is missing a SpriteRenderer!");
+        else _audioSource.clip = _laserSoundClip;
 
         _currentThrusterCharge = _maxThrusterCharge;
         _thrusterSlider.value = _currentThrusterCharge;
+
+        // Initialize Ammo
+        _currentAmmo = _maxAmmo;
+        _uiManager.UpdateAmmo(_currentAmmo);
     }
 
     void Update()
@@ -91,7 +96,6 @@ public class Player : MonoBehaviour
         {
             currentSpeed *= _thrusterSpeed;
             _currentThrusterCharge -= Time.deltaTime * 0.5f;
-
             _thrusterFillImage.color = Color.green;
         }
         else if (!_isCoolingDown)
@@ -132,7 +136,6 @@ public class Player : MonoBehaviour
         }
 
         _currentThrusterCharge = _maxThrusterCharge;
-
         _thrusterFillImage.color = Color.green;
         yield return new WaitForSeconds(1f);
         _thrusterFillImage.color = Color.white;
@@ -147,7 +150,15 @@ public class Player : MonoBehaviour
 
     void FireLaser()
     {
+        if (_currentAmmo <= 0)
+        {
+            // No ammo left — block firing
+            return;
+        }
+
         _canFire = Time.time + _fireRate;
+        _currentAmmo--;
+        _uiManager.UpdateAmmo(_currentAmmo);
 
         if (_isTripleShotActive)
         {
@@ -167,7 +178,6 @@ public class Player : MonoBehaviour
         {
             _shieldStrength--;
 
-            // Change color based on strength
             switch (_shieldStrength)
             {
                 case 2:
