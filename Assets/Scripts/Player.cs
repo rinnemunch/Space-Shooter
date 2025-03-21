@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -27,16 +28,22 @@ public class Player : MonoBehaviour
     private AudioClip _laserSoundClip;
     private AudioSource _audioSource;
 
-
     private bool _isTripleShotActive = false;
     private bool _isSpeedBoostActive = false;
     private bool _isShieldActive = false;
     [SerializeField]
     private GameObject _shieldVisualizer;
     [SerializeField]
-    private GameObject _rightEngine, _leftEngine; 
-    [SerializeField] 
-    private float _thrusterSpeed = 5.0f;
+    private GameObject _rightEngine, _leftEngine;
+
+    // Thruster System Variables
+    [SerializeField] private float _thrusterSpeed = 5.0f;
+    [SerializeField] private float _maxThrusterCharge = 1.0f;
+    private float _currentThrusterCharge;
+    private bool _isCoolingDown;
+
+    [SerializeField] private Slider _thrusterSlider;
+    [SerializeField] private Image _thrusterFillImage; // Fill image reference
 
     void Start()
     {
@@ -45,36 +52,24 @@ public class Player : MonoBehaviour
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _audioSource = GetComponent<AudioSource>();
 
-        if (_spawnManager == null)
-        {
-            Debug.LogError("The Spawn Manager is NULL.");
-        }
+        if (_spawnManager == null) Debug.LogError("The Spawn Manager is NULL.");
+        if (_uiManager == null) Debug.LogError("The UI Manager is NULL.");
+        if (_audioSource == null) Debug.LogError("The Audio Source on the player is NULL.");
+        else _audioSource.clip = _laserSoundClip;
 
-        if (_uiManager == null)
-        {
-            Debug.LogError("The UI Manager is NULL.");
-        }
-
-        if (_audioSource == null)
-        {
-            Debug.LogError("The Audio Source on the player is NULL.");
-        }
-        else
-        {
-            _audioSource.clip = _laserSoundClip;
-        }
+        _currentThrusterCharge = _maxThrusterCharge;
+        _thrusterSlider.value = _currentThrusterCharge;
     }
 
-    // Update is called once per frame
     void Update()
     {
         CalculateMovement();
+        UpdateThrusterUI();
 
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
         {
             FireLaser();
         }
-
     }
 
     void CalculateMovement()
@@ -83,33 +78,78 @@ public class Player : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
 
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
-
-        // Check if the left shift key is held down
         float currentSpeed = _speed;
-        if (Input.GetKey(KeyCode.RightShift))
+
+        // Thruster Activation
+        if (Input.GetKey(KeyCode.RightShift) && _currentThrusterCharge > 0 && !_isCoolingDown)
         {
             currentSpeed *= _thrusterSpeed;
+            _currentThrusterCharge -= Time.deltaTime * 0.5f;
+
+            // Change bar to green while boosting
+            _thrusterFillImage.color = Color.green;
+        }
+        else if (!_isCoolingDown) // Don’t override flash
+        {
+            _thrusterFillImage.color = Color.white;
+        }
+
+
+        if (_currentThrusterCharge <= 0)
+        {
+            _currentThrusterCharge = 0;
+            if (!_isCoolingDown)
+            {
+                StartCoroutine(ThrusterCooldown());
+            }
         }
 
         transform.Translate(direction * currentSpeed * Time.deltaTime);
 
+        // Keep player in bounds
         transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0), 0);
 
         if (transform.position.x > 11.3f)
-        {
             transform.position = new Vector3(-11f, transform.position.y, 0);
-        }
         else if (transform.position.x < -11.3f)
-        {
             transform.position = new Vector3(11f, transform.position.y, 0);
+    }
+
+    IEnumerator ThrusterCooldown()
+    {
+        _isCoolingDown = true;
+
+        yield return new WaitForSeconds(2.0f); // Wait before recharging
+
+        while (_currentThrusterCharge < _maxThrusterCharge)
+        {
+            _currentThrusterCharge += Time.deltaTime * 0.25f;
+            UpdateThrusterUI(); // So the slider updates during recharge
+            yield return null;
         }
+
+        _currentThrusterCharge = _maxThrusterCharge;
+
+        // FLASH GREEN when done
+        _thrusterFillImage.color = Color.green;
+        yield return new WaitForSeconds(1f); // Extended to 1 second
+        _thrusterFillImage.color = Color.white;
+
+        _isCoolingDown = false;
+    }
+
+
+
+    void UpdateThrusterUI()
+    {
+        _thrusterSlider.value = _currentThrusterCharge / _maxThrusterCharge;
     }
 
     void FireLaser()
     {
         _canFire = Time.time + _fireRate;
 
-        if (_isTripleShotActive == true)
+        if (_isTripleShotActive)
         {
             Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
         }
@@ -123,31 +163,25 @@ public class Player : MonoBehaviour
 
     public void Damage()
     {
-        if (_isShieldActive == true)
+        if (_isShieldActive)
         {
             _isShieldActive = false;
             _shieldVisualizer.SetActive(false);
             return;
         }
 
-
         _lives--;
-        
+
         if (_lives == 2)
-        {
             _leftEngine.SetActive(true);
-        }
         else if (_lives == 1)
-        {
             _rightEngine.SetActive(true);
-        }
 
         _uiManager.UpdatetLives(_lives);
 
         if (_lives < 1)
         {
             _spawnManager.OnPlayerDeath();
-
             Destroy(this.gameObject);
         }
     }
@@ -189,7 +223,4 @@ public class Player : MonoBehaviour
         _score += points;
         _uiManager.UpdateScore(_score);
     }
-
-    //method to add 10 to the score
-    //Communicate with UIManager to update the score
 }
