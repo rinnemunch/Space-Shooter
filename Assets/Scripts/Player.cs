@@ -36,6 +36,10 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _rightEngine, _leftEngine;
 
+    // Shield Strength Visual
+    private int _shieldStrength = 3;
+    private SpriteRenderer _shieldRenderer;
+
     // Thruster System Variables
     [SerializeField] private float _thrusterSpeed = 5.0f;
     [SerializeField] private float _maxThrusterCharge = 1.0f;
@@ -43,7 +47,7 @@ public class Player : MonoBehaviour
     private bool _isCoolingDown;
 
     [SerializeField] private Slider _thrusterSlider;
-    [SerializeField] private Image _thrusterFillImage; // Fill image reference
+    [SerializeField] private Image _thrusterFillImage;
 
     void Start()
     {
@@ -56,6 +60,9 @@ public class Player : MonoBehaviour
         if (_uiManager == null) Debug.LogError("The UI Manager is NULL.");
         if (_audioSource == null) Debug.LogError("The Audio Source on the player is NULL.");
         else _audioSource.clip = _laserSoundClip;
+
+        _shieldRenderer = _shieldVisualizer.GetComponent<SpriteRenderer>();
+        if (_shieldRenderer == null) Debug.LogError("Shield Visualizer is missing a SpriteRenderer!");
 
         _currentThrusterCharge = _maxThrusterCharge;
         _thrusterSlider.value = _currentThrusterCharge;
@@ -80,20 +87,17 @@ public class Player : MonoBehaviour
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
         float currentSpeed = _speed;
 
-        // Thruster Activation
         if (Input.GetKey(KeyCode.RightShift) && _currentThrusterCharge > 0 && !_isCoolingDown)
         {
             currentSpeed *= _thrusterSpeed;
             _currentThrusterCharge -= Time.deltaTime * 0.5f;
 
-            // Change bar to green while boosting
             _thrusterFillImage.color = Color.green;
         }
-        else if (!_isCoolingDown) // Don’t override flash
+        else if (!_isCoolingDown)
         {
             _thrusterFillImage.color = Color.white;
         }
-
 
         if (_currentThrusterCharge <= 0)
         {
@@ -106,7 +110,6 @@ public class Player : MonoBehaviour
 
         transform.Translate(direction * currentSpeed * Time.deltaTime);
 
-        // Keep player in bounds
         transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0), 0);
 
         if (transform.position.x > 11.3f)
@@ -119,26 +122,23 @@ public class Player : MonoBehaviour
     {
         _isCoolingDown = true;
 
-        yield return new WaitForSeconds(2.0f); // Wait before recharging
+        yield return new WaitForSeconds(2.0f);
 
         while (_currentThrusterCharge < _maxThrusterCharge)
         {
             _currentThrusterCharge += Time.deltaTime * 0.25f;
-            UpdateThrusterUI(); // So the slider updates during recharge
+            UpdateThrusterUI();
             yield return null;
         }
 
         _currentThrusterCharge = _maxThrusterCharge;
 
-        // FLASH GREEN when done
         _thrusterFillImage.color = Color.green;
-        yield return new WaitForSeconds(1f); // Extended to 1 second
+        yield return new WaitForSeconds(1f);
         _thrusterFillImage.color = Color.white;
 
         _isCoolingDown = false;
     }
-
-
 
     void UpdateThrusterUI()
     {
@@ -165,8 +165,23 @@ public class Player : MonoBehaviour
     {
         if (_isShieldActive)
         {
-            _isShieldActive = false;
-            _shieldVisualizer.SetActive(false);
+            _shieldStrength--;
+
+            // Change color based on strength
+            switch (_shieldStrength)
+            {
+                case 2:
+                    _shieldRenderer.color = Color.yellow;
+                    break;
+                case 1:
+                    _shieldRenderer.color = Color.red;
+                    break;
+                case 0:
+                    _isShieldActive = false;
+                    _shieldVisualizer.SetActive(false);
+                    break;
+            }
+
             return;
         }
 
@@ -215,7 +230,9 @@ public class Player : MonoBehaviour
     public void ShieldsActive()
     {
         _isShieldActive = true;
+        _shieldStrength = 3;
         _shieldVisualizer.SetActive(true);
+        _shieldRenderer.color = Color.blue;
     }
 
     public void AddScore(int points)
