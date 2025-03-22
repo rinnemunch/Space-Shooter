@@ -86,6 +86,7 @@ public class Player : MonoBehaviour
 
     void CalculateMovement()
     {
+
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
@@ -120,6 +121,9 @@ public class Player : MonoBehaviour
             transform.position = new Vector3(-11f, transform.position.y, 0);
         else if (transform.position.x < -11.3f)
             transform.position = new Vector3(11f, transform.position.y, 0);
+
+        Debug.Log("Horizontal: " + horizontalInput + " | Vertical: " + verticalInput);
+
     }
 
     IEnumerator ThrusterCooldown()
@@ -250,4 +254,12 @@ public class Player : MonoBehaviour
         _score += points;
         _uiManager.UpdateScore(_score);
     }
+
+    public void RefillAmmo()
+    {
+        _currentAmmo = _maxAmmo;
+        _uiManager.UpdateAmmo(_currentAmmo);
+        Debug.Log("Ammo refilled!");
+    }
+
 }
