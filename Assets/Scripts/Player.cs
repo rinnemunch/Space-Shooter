@@ -262,4 +262,25 @@ public class Player : MonoBehaviour
         Debug.Log("Ammo refilled!");
     }
 
+    public void HealPlayer()
+    {
+        if (_lives < 3)
+        {
+            _lives++;
+            _uiManager.UpdatetLives(_lives);
+
+            if (_lives == 2)
+            {
+                _rightEngine.SetActive(false);
+            }
+            else if (_lives == 3)
+            {
+                _leftEngine.SetActive(false);
+                _rightEngine.SetActive(false);
+            }
+
+            Debug.Log("Player healed by 1!");
+        }
+    }
+
 }
