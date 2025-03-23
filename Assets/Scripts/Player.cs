@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _lives = 3;
     private SpawnManager _spawnManager;
+    private CameraShake _cameraShake; // Added for camera shake
+
 
     [SerializeField]
     private int _score;
@@ -51,6 +53,11 @@ public class Player : MonoBehaviour
     [SerializeField] private int _maxAmmo = 15;
     private int _currentAmmo;
 
+    //green laser rapid fire 
+    private bool _isRapidFireActive = false;
+    [SerializeField] private float _rapidFireRate = 0.1f;
+
+
     void Start()
     {
         transform.position = new Vector3(0, 0, 0);
@@ -71,6 +78,9 @@ public class Player : MonoBehaviour
         // Initialize Ammo
         _currentAmmo = _maxAmmo;
         _uiManager.UpdateAmmo(_currentAmmo);
+
+        //GameObject.Find("Rapid_Powerup_Spawner").GetComponent<Rapid>().StartSpawning();
+        _cameraShake = Camera.main.GetComponent<CameraShake>(); // Added for camera shake
     }
 
     void Update()
@@ -160,7 +170,7 @@ public class Player : MonoBehaviour
             return;
         }
 
-        _canFire = Time.time + _fireRate;
+        _canFire = Time.time + (_isRapidFireActive ? _rapidFireRate : _fireRate);
         _currentAmmo--;
         _uiManager.UpdateAmmo(_currentAmmo);
 
@@ -199,6 +209,11 @@ public class Player : MonoBehaviour
             return;
         }
 
+        if (_cameraShake != null)
+        {
+            _cameraShake.Shake();
+        }
+
         _lives--;
 
         if (_lives == 2)
@@ -214,6 +229,7 @@ public class Player : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
+
 
     public void TripleShotActive()
     {
@@ -283,4 +299,15 @@ public class Player : MonoBehaviour
         }
     }
 
+        public void RapidFireActive()
+        {
+            _isRapidFireActive = true;
+            StartCoroutine(RapidFirePowerDownRoutine());
+        }
+
+        IEnumerator RapidFirePowerDownRoutine()
+        {
+            yield return new WaitForSeconds(5.0f);
+            _isRapidFireActive = false;
+        }
 }

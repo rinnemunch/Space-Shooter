@@ -568,6 +568,51 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &684045866
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 684045868}
+  - component: {fileID: 684045867}
+  m_Layer: 0
+  m_Name: RapidPowerUpSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &684045867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684045866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b93d5886793c34b807851032a4b9df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rapidFirePowerup: {fileID: 3238723364260392104, guid: 269ec751241ef8e4e903845a490ed7d4,
+    type: 3}
+--- !u!4 &684045868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684045866}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.74, y: 2.855, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &813232554
 GameObject:
   m_ObjectHideFlags: 0
@@ -1223,6 +1268,7 @@ GameObject:
   - component: {fileID: 1264191882}
   - component: {fileID: 1264191881}
   - component: {fileID: 1264191884}
+  - component: {fileID: 1264191885}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1355,6 +1401,20 @@ MonoBehaviour:
   m_BeforeTransparentBundles: []
   m_BeforeStackBundles: []
   m_AfterStackBundles: []
+--- !u!114 &1264191885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1264191880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68752673b7e091d4b863ec327a7a167b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shakeDuration: 0.2
+  _shakeMagnitude: 0.49
 --- !u!1 &1266310457
 GameObject:
   m_ObjectHideFlags: 0
@@ -1470,6 +1530,7 @@ MonoBehaviour:
   _thrusterSlider: {fileID: 813232556}
   _thrusterFillImage: {fileID: 211820211}
   _maxAmmo: 15
+  _rapidFireRate: 0.1
 --- !u!212 &1419756623
 SpriteRenderer:
   m_ObjectHideFlags: 0
